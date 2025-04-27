@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title> AdonisJS - A fully featured web framework for Node.js </title>
+
+  @vite(['resources/css/app.css', 'resources/js/app.js'])
+</head>
+<body>
+
+  <div class="m-8">
+    @jrmc.form({ id: 'edit_file', class: 'md:col-span-2', action: route('home.update', file, {
+      qs: {
+        _method: 'PUT'
+      }
+    }),
+    enctype: 'multipart/form-data',
+    error: false,
+    object: file })
+
+    <div class="card bg-base-200">
+      <div class="card-body">
+        @if(file && file.image)
+          <div>
+            <img
+              class="object-cover mt-2"
+              src="{{ await file.image.getUrl('thumbnail') }}"
+              alt=""
+              loading="lazy"
+            />
+          </div>
+
+          <div id="canvas"></div>
+
+          @if (file.image.variants && file.image.variants[0].blurhash)
+          <script type="module">
+            import { decodeBlurHash } from 'https://cdn.skypack.dev/fast-blurhash'
+
+            const width = {{ file.image.variants[0].meta.dimension.width }}
+            const height = {{ file.image.variants[0].meta.dimension.height }}
+
+
+            const pixels = decodeBlurHash('{{ file.image.variants[0].blurhash }}', width, height)
+
+            // draw it on canvas
+            const canvas = document.createElement('canvas')
+            canvas.width = width
+            canvas.height = height
+            const ctx = canvas.getContext('2d')
+            const imageData = ctx.createImageData(width, height)
+            imageData.data.set(pixels)
+            ctx.putImageData(imageData, 0, 0)
+            document.getElementById('canvas').append(canvas)
+          </script>
+          @end
+
+
+        @end
+
+        @jrmc.form.control({ name: 'image' })
+          @!jrmc.form.file()
+        @end
+      </div>
+    </div>
+
+    <div class="mt-4 card bg-base-200">
+      <div class="card-body">
+        @if(file && file.pdf)
+          <img
+            class="object-cover w-40 mt-2"
+            src="{{ await file.pdf.getSignedUrl('pdf') }}"
+            alt=""
+            loading="lazy"
+          />
+        @end
+
+        @jrmc.form.control({ name: 'pdf' })
+          @!jrmc.form.file()
+        @end
+      </div>
+    </div>
+
+    <div class="mt-4 card bg-base-200">
+      <div class="card-body">
+        @if(file && file.document)
+          <img
+            class="object-cover w-40 mt-2"
+            src="{{ await file.document.getSignedUrl('document') }}"
+            alt=""
+            loading="lazy"
+          />
+        @end
+
+        @jrmc.form.control({ name: 'document' })
+          @!jrmc.form.file()
+        @end
+      </div>
+    </div>
+
+    <div class="mt-4 card bg-base-200">
+      <div class="card-body">
+        @if(file && file.video)
+          <img
+            class="object-cover w-40 mt-2"
+            src="{{ await file.video.getSignedUrl('video') }}"
+            alt=""
+            loading="lazy"
+          />
+        @end
+
+        @jrmc.form.control({ name: 'video' })
+          @!jrmc.form.file()
+        @end
+      </div>
+    </div>
+
+      @!jrmc.button.input({ text: t('form.submit'), type: 'submit', form: 'edit_file', class: 'btn-primary normal-case w-full mt-4' })
+    @end
+
+
+
+
+    @jrmc.form({ id: 'delete_file', class: 'md:col-span-2', action: route('home.destroy', file, {
+      qs: {
+        _method: 'DELETE'
+      }
+    }),
+    enctype: 'multipart/form-data',
+    error: false,
+    object: file })
+
+      @!jrmc.button.input({ text: 'reset', type: 'submit', form: 'delete_file', class: 'btn-error normal-case mt-4 w-full' })
+    @end
+
+  </div>
+
+  @!notifications()
+
+
+</body>
+</html>
