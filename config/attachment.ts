@@ -2,6 +2,7 @@ import { defineConfig } from '@jrmc/adonis-attachment'
 import { InferConverters } from '@jrmc/adonis-attachment/types/config'
 
 const attachmentConfig = defineConfig({
+  meta: true,
   converters: {
     thumbnail: {
       converter: () => import('@jrmc/adonis-attachment/converters/image_converter'),
